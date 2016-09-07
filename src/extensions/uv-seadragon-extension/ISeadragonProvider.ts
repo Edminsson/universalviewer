@@ -34,6 +34,8 @@ interface ISeadragonProvider extends IProvider{
     isPagingSettingEnabled(): boolean;
     getNextPageIndex(index?: number): number;
     getPrevPageIndex(index?: number): number;
+    getPrevFivePageIndex(index?: number): number;
+    getNextFivePageIndex(index?: number): number;
     searchResults: SearchResult[];
     searchWithin(terms: string, callback: (results: any) => void): void;
 }

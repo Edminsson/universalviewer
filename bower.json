@@ -15,7 +15,8 @@
     "tasks",
     "tests"
   ],
-  "dependencies": {},
+  "dependencies": {
+  },
   "devDependencies": {
     "exjs": "BSick7/exjs",
     "extensions": "edsilv/extensions",
@@ -23,8 +24,11 @@
     "jquery-plugins": "edsilv/jquery-plugins",
     "jquery-tiny-pubsub": "edsilv/jquery-tiny-pubsub",
     "key-codes": "edsilv/key-codes",
-    "utils": "edsilv/utils",
+    "utils": "riksarkivet/utils#master",
     "uv-cy-GB-theme": "universalviewer/uv-cy-GB-theme",
-    "uv-en-GB-theme": "universalviewer/uv-en-GB-theme"
+    "uv-en-GB-theme": "universalviewer/uv-en-GB-theme",
+    "uv-sv-SE-theme": "riksarkivet/uv-sv-SE-theme",
+    "openseadragon-filtering": "NIST-ISG/OpenSeadragonFiltering#master",
+    "rangeslider.js": "^2.1.1"
   }
 }

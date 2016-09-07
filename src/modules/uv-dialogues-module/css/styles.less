@@ -4,7 +4,7 @@
     .overlay{
 
         color: @text-secondary-color;
-
+        
         &.embed{
             width: 470px;
             padding: 0 0 30px 8px;
@@ -255,6 +255,43 @@
                 float: right;
             }
 
+            .bottom{
+                background: none;
+            }
+        }
+        
+        &.adjust{
+            width: 470px;
+            height: 250px;
+            
+            .middle{
+                .content{
+                    > div {
+                        height: 70px;
+                        margin: 10px 0 10px 0;
+                        text-align: center;
+                        
+                        label {
+                            position: relative;
+                            top: -9px;
+                            font-size: 17px;
+                        }
+                    }
+                    
+                    .reset {
+                        height: 20px
+                    }
+                    
+                    .rangeslider__fill {
+                        background: @brand-primary-light;
+                    }
+                    
+                    button {
+                        font-size: 14px;
+                    }
+                }
+            }
+            
             .bottom{
                 background: none;
             }

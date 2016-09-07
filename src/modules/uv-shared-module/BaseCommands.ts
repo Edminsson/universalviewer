@@ -9,6 +9,7 @@ class Commands {
     static CLOSE_ACTIVE_DIALOGUE: string            = Commands.namespace + 'onCloseActiveDialogue';
     static CLOSE_LEFT_PANEL: string                 = Commands.namespace + 'onCloseLeftPanel';
     static CLOSE_RIGHT_PANEL: string                = Commands.namespace + 'onCloseRightPanel';
+    static COPY_SOURCE_REFERENCE: string            = Commands.namespace + 'onCopySourceReference';
     static CREATED: string                          = Commands.namespace + 'onCreated';
     static DOWN_ARROW: string                       = Commands.namespace + 'onDownArrow';
     static DOWNLOAD: string                         = Commands.namespace + 'onDownload';
@@ -29,6 +30,7 @@ class Commands {
     static HIDE_OVERLAY: string                     = Commands.namespace + 'onHideOverlay';
     static HIDE_RESTRICTED_DIALOGUE: string         = Commands.namespace + 'onHideRestrictedDialogue';
     static HIDE_SETTINGS_DIALOGUE: string           = Commands.namespace + 'onHideSettingsDialogue';
+    static HIDE_ADJUST_DIALOGUE: string             = Commands.namespace + 'onHideAdjustDialogue';
     static HOME: string                             = Commands.namespace + 'onHome';
     static LEFT_ARROW: string                       = Commands.namespace + 'onLeftArrow';
     static LEFTPANEL_COLLAPSE_FULL_FINISH: string   = Commands.namespace + 'onLeftPanelCollapseFullFinish';
@@ -74,12 +76,16 @@ class Commands {
     static SHOW_OVERLAY: string                     = Commands.namespace + 'onShowOverlay';
     static SHOW_RESTRICTED_DIALOGUE: string         = Commands.namespace + 'onShowRestrictedDialogue';
     static SHOW_SETTINGS_DIALOGUE: string           = Commands.namespace + 'onShowSettingsDialogue';
+    static SHOW_ADJUST_DIALOGUE: string             = Commands.namespace + 'onShowAdjustDialogue';
     static THUMB_SELECTED: string                   = Commands.namespace + 'onThumbSelected';
     static TOGGLE_FULLSCREEN: string                = Commands.namespace + 'onToggleFullScreen';
     static UP_ARROW: string                         = Commands.namespace + 'onUpArrow';
     static UPDATE_SETTINGS: string                  = Commands.namespace + 'onUpdateSettings';
     static VIEW_FULL_TERMS: string                  = Commands.namespace + 'onViewFullTerms';
     static WINDOW_UNLOAD: string                    = Commands.namespace + 'onWindowUnload';
+    static ADJUST_CONTRAST: string                  = Commands.namespace + 'onAdjustContrast';
+    static ADJUST_BRIGHTNESS: string                = Commands.namespace + 'onAdjustBrightness';
+    static ADJUST_FINALIZE: string                  = Commands.namespace + 'onAdjustFinalize';
 }
 
 export = Commands;

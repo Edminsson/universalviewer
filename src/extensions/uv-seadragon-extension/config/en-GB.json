@@ -3,6 +3,8 @@
   {
     "bookmarkThumbHeight": 150,
     "bookmarkThumbWidth": 90,
+    "brightnessPercent": 50,
+    "contrastPercent": 50,
     "leftPanelEnabled": true,
     "limitLocales": false,
     "minWidthBreakPoint": 610,
@@ -14,6 +16,7 @@
     "preserveViewport": false,
     "rightPanelEnabled": true,
     "saveUserSettings": false,
+    "zoomPerClickEnabled": true,
     "searchWithinEnabled": true,
     "theme": "uv-en-GB-theme",
     "tokenStorage": "session",
@@ -58,8 +61,8 @@
       "options":
       {
         "confinedImageSize": 1000,
-        "maxImageWidth": 5000,
-        "selectionEnabled": false
+        "showInBottomCorner": true,
+        "maxImageWidth": 1000
       }
     },
     "embedDialogue":
@@ -101,7 +104,9 @@
         "panelExpandedWidth": 255,
         "panelOpen": false,
         "textLimit": 4,
-        "textLimitType": "lines"
+        "textLimitType": "lines",
+        "aggregateValues": "",
+        "showCopyToClipboard": false
       }
     },
     "pagingHeaderPanel":
@@ -112,7 +117,12 @@
         "imageSelectionBoxEnabled": false,
         "localeToggleEnabled": false,
         "pageModeEnabled": true,
-        "pagingToggleEnabled": true
+        "pagingToggleEnabled": true,
+        "imageDropdownEnabled":  false,
+        "prevNextFiveButtonsEnabled": false,
+        "downloadEnabled": false,
+        "printEnabled": false,
+        "fullscreenEnabled": false
       }
     },
     "seadragonCenterPanel":
@@ -133,7 +143,8 @@
         "pageGap": 0.01,
         "showHomeControl": false,
         "trimAttributionCount": 150,
-        "visibilityRatio": 0.5
+        "visibilityRatio": 0.5,
+        "showNavigationToTheRight": false
       }
     },
     "searchFooterPanel":
@@ -146,6 +157,35 @@
     },
     "settingsDialogue":
     {
+    },
+    "adjustDialogue":
+    {
+    },
+    "treeViewLeftPanel":
+    {
+      "options":
+      {
+        "elideCount": 40,
+        "expandFullEnabled": true,
+        "galleryThumbHeight": 320,
+        "galleryThumbWidth": 200,
+        "oneColThumbHeight": 320,
+        "oneColThumbWidth": 200,
+        "pageModeEnabled": true,
+        "panelAnimationDuration": 250,
+        "panelCollapsedWidth": 30,
+        "panelExpandedWidth": 255,
+        "panelOpen": true,
+        "tabOrder": "",
+        "thumbsEnabled": true,
+        "thumbsExtraHeight": 8,
+        "thumbsImageFadeInDuration": 300,
+        "thumbsLoadRange": 15,
+        "treeEnabled": true,
+        "twoColThumbHeight": 150,
+        "twoColThumbWidth": 90,
+        "enableExpandFullButton": true
+      }
     }
   }
 }

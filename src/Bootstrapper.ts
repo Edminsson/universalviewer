@@ -49,20 +49,25 @@ class Bootstrapper{
         return (null === this.params.jsonp) ? Modernizr.cors : !this.params.jsonp;
     }
 
-    loadIIIFResource(): void{
+    loadIIIFResource(): void {
         var that = this;
 
-        if (that.isCORSEnabled()){
-            $.getJSON(that.params.manifestUri, (r) => {
-                that.iiifResource = that.parseIIIFResource(JSON.stringify(r));
-                that.loadResource().then((manifest: Manifesto.IManifest) => {
-                    if (!manifest){
-                        that.notFound();
-                        return;
-                    }
+        if (this.isCORSEnabled()) {
+            $.ajax({
+                dataType: "json",
+                url: that.params.manifestUri,
+                xhrFields: { withCredentials: true },
+                success: (r) => {
+                    this.iiifResource = that.parseIIIFResource(JSON.stringify(r));
+                    this.loadResource().then((manifest: Manifesto.IManifest) => {
+                        if (!manifest) {
+                            this.notFound();
+                            return;
+                        }
 
-                    that.manifestLoaded(manifest);
-                });
+                        this.manifestLoaded(manifest);
+                    });
+                }
             });
         } else {
             // use jsonp

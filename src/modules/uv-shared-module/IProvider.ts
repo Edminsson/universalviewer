@@ -41,6 +41,7 @@ interface IProvider extends IIxIFProvider{
     getLogo(): string;
     getManifestType(): Manifesto.ManifestType;
     getMetadata(): IMetadataItem[];
+    getPagedIndices(index?: number): number[];
     getPagedIndices(index?: number): number[]; // todo: rename to something generic
     getRangeByPath(path: string): Manifesto.IRange;
     getRangeCanvases(range: Manifesto.IRange): Manifesto.ICanvas[];
@@ -68,6 +69,7 @@ interface IProvider extends IIxIFProvider{
     config: any;
     domain: string;
     embedDomain: string;
+    hasNoPageNumbers: boolean;
     isHomeDomain: boolean;
     isLightbox: boolean;
     isOnlyInstance: boolean;

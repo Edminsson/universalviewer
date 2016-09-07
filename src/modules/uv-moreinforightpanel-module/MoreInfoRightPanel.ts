@@ -10,11 +10,11 @@ class MoreInfoRightPanel extends RightPanel {
     $canvasItems: JQuery;
     $noData: JQuery;
     moreInfoItemTemplate: JQuery;
+    copyTextTemplate: JQuery;
     manifestData: IMetadataItem[];
     canvasData: IMetadataItem[];
     aggregateValuesConfig: string[];
     canvasExcludeConfig: string[];
-    copyTextTemplate: JQuery;
 
     constructor($element: JQuery) {
         super($element);
@@ -66,6 +66,16 @@ class MoreInfoRightPanel extends RightPanel {
             this.canvasData = this.getCanvasData(this.provider.getCanvasByIndex(canvasIndex));
             this.displayInfo();
         });
+
+        $.subscribe(BaseCommands.COPY_SOURCE_REFERENCE, (e) => {
+            var label = this.content.sourceReference;
+            var $copyBtn = $('.items .item .header:contains(' + label + ') .copyText');
+            $copyBtn.show();
+            this.copyValueForLabel(label);
+            setTimeout(function() {
+                $copyBtn.hide();
+            }, 2000);
+        });
     }
     
     getManifestData() {
@@ -94,10 +104,7 @@ class MoreInfoRightPanel extends RightPanel {
     
     readConfig(config: string) {
         if (config) {
-            return config
-                .toLowerCase()
-                .replace(/ /g,"")
-                .split(',');
+            return _.map(config.toLowerCase().split(','), x => _.trim(x));
         }
         else {
             return [];
@@ -265,7 +272,7 @@ class MoreInfoRightPanel extends RightPanel {
 
         $elem.addClass(item.label.toCssClass());
 
-        if (this.config.options.copyToClipboardEnabled && Utils.Clipboard.SupportsCopy() && $text.text() && $header.text())
+        if (this.config.options.showCopyToClipboard && Utils.Clipboard.SupportsCopy() && $text.text() && $header.text())
             this.addCopyButton($elem, $header);
         
         return $elem;

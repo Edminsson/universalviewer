@@ -326,6 +326,74 @@ class Provider extends BaseProvider implements ISeadragonProvider{
 
         return index;
     }
+    
+    getPrevFivePageIndex(canvasIndex?: number): number {
+        if (_.isUndefined(canvasIndex)) canvasIndex = this.canvasIndex;
+
+        var index;
+
+        if (this.isPagingSettingEnabled()) {
+            var indices = this.getPagedIndices(canvasIndex);
+
+            if (this.isRightToLeft()){
+                index = this.tryDecrementIndex(indices[0], 5);
+            } else {
+                index = this.tryDecrementIndex(indices.last(), 5);
+            }
+
+        } else {
+            index = this.tryDecrementIndex(canvasIndex, 5);
+        }
+
+        return index;
+    }
+
+    getNextFivePageIndex(canvasIndex?: number): number {
+        if (_.isUndefined(canvasIndex)) canvasIndex = this.canvasIndex;
+
+        var index;
+
+        if (this.isPagingSettingEnabled()) {
+            var indices = this.getPagedIndices(canvasIndex);
+
+            if (this.isRightToLeft()){
+                index = this.tryIncrementIndex(indices[0], 5);
+            } else {
+                index = this.tryIncrementIndex(indices.last(), 5);
+            }
+
+        } else {
+            index = this.tryIncrementIndex(canvasIndex, 5);
+        }
+
+        return index;
+    }
+
+    tryDecrementIndex(currentIndex: number, numberToIncrement: number): number {
+        for (var i = 0; i < numberToIncrement; i++) {
+            if (currentIndex > 0) {
+                currentIndex--;
+            }
+            else {
+                break;
+            }
+        }
+        return currentIndex;
+    }
+
+    tryIncrementIndex(currentIndex: number, numberToIncrement: number): number {
+        var totalCanvases = this.getTotalCanvases();
+        for (var i = 0; i < numberToIncrement; i++) {
+            if (currentIndex < (totalCanvases -1)) {
+                currentIndex++;
+            }
+            else {
+                break;
+            }
+        }
+        return currentIndex;
+    }
+
 
     getAutoCompleteService(): Manifesto.IService {
         var service: Manifesto.IService = this.getSearchWithinService();

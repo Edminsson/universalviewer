@@ -104,7 +104,7 @@ class FooterPanel extends BaseView {
     }
 
     updateFullScreenButton(): void {
-        if (!Utils.Bools.GetBool(this.options.fullscreenEnabled, true)){
+        if (!Utils.Documents.SupportsFullscreen() || !Utils.Bools.GetBool(this.options.fullscreenEnabled, true)) {
             this.$fullScreenBtn.hide();
         }
 

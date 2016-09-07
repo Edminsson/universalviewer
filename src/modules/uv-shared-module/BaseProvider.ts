@@ -20,6 +20,7 @@ class BaseProvider implements IProvider{
     domain: string;
     embedDomain: string;
     embedScriptUri: string;
+    hasNoPageNumbers: boolean;
     iiifResource: Manifesto.IIIIFResource;
     isHomeDomain: boolean;
     isLightbox: boolean;
@@ -62,6 +63,7 @@ class BaseProvider implements IProvider{
         this.embedScriptUri = this.bootstrapper.params.embedScriptUri;
         this.domain = this.bootstrapper.params.domain;
         this.isLightbox = this.bootstrapper.params.isLightbox;
+        this.hasNoPageNumbers = this.bootstrapper.params.hasNoPageNumbers;
 
         this.collectionIndex = this.bootstrapper.params.collectionIndex;
         this.manifestIndex = this.bootstrapper.params.manifestIndex;

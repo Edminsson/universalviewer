@@ -15,7 +15,12 @@ class RightPanel extends BaseExpandPanel {
     init(): void{
         super.init();
 
-        if (this.options.panelOpen) {
+        if (window.matchMedia && window.matchMedia("(max-width: 768px)").matches) 
+            return;
+
+        var panelOpenSaved = Utils.Bools.GetBool(this.provider.getSettings().panelOpenRightPanel, true);
+
+        if (this.options.panelOpen && panelOpenSaved) {
             this.toggle(true);
         }
     }
@@ -30,12 +35,16 @@ class RightPanel extends BaseExpandPanel {
 
     toggleFinish(): void {
         super.toggleFinish();
+        var settings: ISettings = this.provider.getSettings();
 
-        if (this.isExpanded){
+        if (this.isExpanded) {
+            settings.panelOpenRightPanel = true; 
             $.publish(BaseCommands.OPEN_RIGHT_PANEL);
-        } else {
+        } else {            
+            settings.panelOpenRightPanel = false;            
             $.publish(BaseCommands.CLOSE_RIGHT_PANEL);
         }
+        this.provider.updateSettings(settings);
     }
 
     resize(): void {

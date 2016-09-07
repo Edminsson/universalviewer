@@ -22,6 +22,7 @@ import RightPanel = require("../../modules/uv-shared-module/RightPanel");
 import SeadragonCenterPanel = require("../../modules/uv-seadragoncenterpanel-module/SeadragonCenterPanel");
 import Settings = require("../../modules/uv-shared-module/Settings");
 import SettingsDialogue = require("./SettingsDialogue");
+import AdjustDialogue = require("./AdjustDialogue");
 import Shell = require("../../modules/uv-shared-module/Shell");
 import ThumbsView = require("../../modules/uv-contentleftpanel-module/ThumbsView");
 import TreeView = require("../../modules/uv-contentleftpanel-module/TreeView");
@@ -34,6 +35,7 @@ class Extension extends BaseExtension {
     $externalContentDialogue: JQuery;
     $helpDialogue: JQuery;
     $settingsDialogue: JQuery;
+    $adjustDialogue: JQuery;
     centerPanel: SeadragonCenterPanel;
     currentRotation: number = 0;
     downloadDialogue: DownloadDialogue;
@@ -46,6 +48,7 @@ class Extension extends BaseExtension {
     mode: Mode;
     rightPanel: MoreInfoRightPanel;
     settingsDialogue: SettingsDialogue;
+    adjustDialogue: AdjustDialogue;
 
     constructor(bootstrapper: BootStrapper) {
         super(bootstrapper);
@@ -73,6 +76,7 @@ class Extension extends BaseExtension {
         $.subscribe(Commands.FIRST, (e) => {
             this.triggerSocket(Commands.FIRST);
             this.viewPage(this.provider.getFirstPageIndex());
+            this.triggerTrackEvent(Commands.FIRST);
         });
 
         $.subscribe(Commands.GALLERY_DECREASE_SIZE, (e) => {
@@ -94,11 +98,13 @@ class Extension extends BaseExtension {
         $.subscribe(Commands.IMAGE_SEARCH, (e, index: number) => {
             this.triggerSocket(Commands.IMAGE_SEARCH, index);
             this.viewPage(index);
+            this.triggerTrackEvent(Commands.IMAGE_SEARCH);
         });
 
         $.subscribe(Commands.LAST, (e) => {
             this.triggerSocket(Commands.LAST);
             this.viewPage(this.provider.getLastPageIndex());
+            this.triggerTrackEvent(Commands.LAST);
         });
 
         $.subscribe(BaseCommands.LEFT_ARROW, (e) => {
@@ -140,6 +146,10 @@ class Extension extends BaseExtension {
             this.viewPage((<ISeadragonProvider>this.provider).getNextPageIndex());
         });
 
+        $.subscribe(Commands.NEXT_FIVE, (e) => {
+            this.viewPage((<ISeadragonProvider>this.provider).getNextFivePageIndex());
+        });
+
         $.subscribe(Commands.NEXT_SEARCH_RESULT, () => {
             this.triggerSocket(Commands.NEXT_SEARCH_RESULT);
             this.nextSearchResult();
@@ -177,6 +187,10 @@ class Extension extends BaseExtension {
         $.subscribe(Commands.PREV, (e) => {
             this.triggerSocket(Commands.PREV);
             this.viewPage((<ISeadragonProvider>this.provider).getPrevPageIndex());
+        });
+        
+        $.subscribe(Commands.PREV_FIVE, (e) => {
+            this.viewPage((<ISeadragonProvider>this.provider).getPrevFivePageIndex());
         });
 
         $.subscribe(Commands.PREV_SEARCH_RESULT, () => {
@@ -280,6 +294,11 @@ class Extension extends BaseExtension {
             this.checkForSearchParam();
         });
     }
+    
+    private triggerTrackEvent(category)
+    {
+        this.triggerSocket('uv.onTrackEvent', {category: category, action:"", label:"", value:""});
+    }
 
     createModules(): void{
         super.createModules();
@@ -317,6 +336,10 @@ class Extension extends BaseExtension {
         this.$settingsDialogue = $('<div class="overlay settings"></div>');
         Shell.$overlays.append(this.$settingsDialogue);
         this.settingsDialogue = new SettingsDialogue(this.$settingsDialogue);
+        
+        this.$adjustDialogue = $('<div class="overlay adjust"></div>');
+        Shell.$overlays.append(this.$adjustDialogue);
+        this.adjustDialogue = new AdjustDialogue(this.$adjustDialogue);
 
         this.$externalContentDialogue = $('<div class="overlay externalContent"></div>');
         Shell.$overlays.append(this.$externalContentDialogue);

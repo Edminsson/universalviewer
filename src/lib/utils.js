@@ -2705,30 +2705,6 @@ var Utils;
 })(Utils || (Utils = {}));
 var Utils;
 (function (Utils) {
-    var Files = (function () {
-        function Files() {
-        }
-        Files.SimplifyMimeType = function (mime) {
-            switch (mime) {
-                case 'text/plain':
-                    return 'txt';
-                case 'image/jpeg':
-                    return 'jpg';
-                case 'application/msword':
-                    return 'doc';
-                case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-                    return 'docx';
-                default:
-                    var parts = mime.split('/');
-                    return parts[parts.length - 1];
-            }
-        };
-        return Files;
-    })();
-    Utils.Files = Files;
-})(Utils || (Utils = {}));
-var Utils;
-(function (Utils) {
     var Keyboard = (function () {
         function Keyboard() {
         }
@@ -3115,7 +3091,31 @@ var Utils;
             if (index != -1) {
                 url = url.substr(0, url.indexOf('#'));
             }
-            doc.location.replace(url + newHash);
+            if (window.top.history.replaceState)
+                window.top.history.replaceState(null, null, url + newHash);
+            else
+                doc.location.replace(url + newHash);
+        };
+        Urls.SetUrlAfter = function (searchvalue, value, doc) {
+            if (!doc)
+                doc = window.document;
+            var url = doc.URL;
+            var searchIndex = url.lastIndexOf(searchvalue);
+            if (searchIndex == -1)
+                return;
+            var startUrl = url.substr(0, searchIndex);
+            var endUrl = url.substr(searchIndex);
+            var indexAfter = endUrl.indexOf("?");
+            if (indexAfter == -1)
+                indexAfter = endUrl.indexOf("&");
+            if (indexAfter == -1)
+                indexAfter = endUrl.indexOf("#");
+            if (indexAfter != -1)
+                endUrl = endUrl.substr(indexAfter);
+            else
+                endUrl = "";
+            if (window.top.history.replaceState)
+                window.top.history.replaceState(null, null, startUrl + searchvalue + value + endUrl);
         };
         Urls.GetQuerystringParameter = function (key, w) {
             if (!w)

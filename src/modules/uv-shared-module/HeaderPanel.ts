@@ -6,6 +6,9 @@ import InformationAction = require("../uv-shared-module/InformationAction");
 import InformationArgs = require("../uv-shared-module/InformationArgs");
 import InformationFactory = require("../uv-shared-module/InformationFactory");
 import SettingsDialogue = require("../uv-dialogues-module/SettingsDialogue");
+import RiksarkivetPrint = require("../../modules/uv-shared-module/RiksarkivetPrint");
+import ISeadragonExtension = require("../../Extensions/uv-seadragon-extension/ISeadragonExtension");
+import ISeadragonProvider = require("../../Extensions/uv-seadragon-extension/ISeadragonProvider");
 
 class HeaderPanel extends BaseView {
 
@@ -14,8 +17,13 @@ class HeaderPanel extends BaseView {
     $informationBox: JQuery;
     $localeToggleButton: JQuery;
     $options: JQuery;
+    $headerBorder: JQuery;
     $rightOptions: JQuery;
     $settingsButton: JQuery;
+    $downloadButton: JQuery;
+    $printButton: JQuery;
+    $fullScreenBtn: JQuery;
+    $linkOldImageViewer: JQuery;
     information: Information;
 
     constructor($element: JQuery) {
@@ -28,6 +36,11 @@ class HeaderPanel extends BaseView {
 
         super.create();
 
+        $.subscribe(BaseCommands.SETTINGS_CHANGED, () => {
+            this.updateButton(this.$downloadButton, "downloadEnabled");
+            this.updateButton(this.$printButton, "printEnabled");
+        });
+
         $.subscribe(BaseCommands.SHOW_INFORMATION, (e, args: InformationArgs) => {
             this.showInformation(args);
         });
@@ -36,8 +49,16 @@ class HeaderPanel extends BaseView {
             this.hideInformation();
         });
 
+        $.subscribe(BaseCommands.TOGGLE_FULLSCREEN, () => {
+            this.updateFullScreenButton();
+            this.updateOldImageViewerLink();
+        });
+
         this.$options = $('<div class="options"></div>');
         this.$element.append(this.$options);
+
+        this.$headerBorder = $('<div class="headerBorder"></div>');
+        this.$element.append(this.$headerBorder);
 
         this.$centerOptions = $('<div class="centerOptions"></div>');
         this.$options.append(this.$centerOptions);
@@ -51,9 +72,49 @@ class HeaderPanel extends BaseView {
         this.$localeToggleButton = $('<a class="localeToggle"></a>');
         this.$rightOptions.append(this.$localeToggleButton);
 
-        this.$settingsButton = $('<a class="imageBtn settings" tabindex="3"></a>');
+        //Temporary code for Beta viewer
+        if (this.bootstrapper.params.isHomeDomain) {
+            var url = parent.document.URL;
+    
+            if (url.indexOf("?") > -1) {
+                url = url.substr(0, url.indexOf("?"));
+            }
+            var checkMobile = false;
+            if (navigator.userAgent.match(/Android/i) || navigator.userAgent.match(/webOS/i) || navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/iPod/i) || navigator.userAgent.match(/BlackBerry/i) || navigator.userAgent.match(/Windows Phone/i)) {
+                checkMobile = true;
+            }
+            var checkOnlyUVViewer = false;
+            if (url.contains("Folk_")) {
+                checkOnlyUVViewer = true;
+            }
+            if (!checkMobile && !checkOnlyUVViewer) {
+                this.$linkOldImageViewer = $('<a class="linkOldImageViewer" target="_top" tabindex="2" title="' + this.content.backOldImageViewer + '" href="' + url + '?viewer=DjVu">' + this.content.backOldImageViewer + '</a>');
+                this.$rightOptions.append(this.$linkOldImageViewer);
+            }
+        }
+        //END Temporary code for Beta viewer
+
+        this.$settingsButton = $('<a class="settings" tabindex="3" title="' + this.content.settings + '"><span /></a>');
         this.$settingsButton.attr('title', this.content.settings);
         this.$rightOptions.append(this.$settingsButton);
+
+        this.$downloadButton = $('<a class="download" tabindex="4" title="' + this.content.download + '"><span /></a>');
+        this.$rightOptions.append(this.$downloadButton);
+        
+        this.$printButton = $('<a class="print" tabindex="5" title="' + this.content.print + '"><span /></a>');
+        this.$rightOptions.append(this.$printButton);
+        
+        this.$fullScreenBtn = $('<a href="#" class="fullScreen" tabindex="6" title="' + this.content.fullScreen + '"><span /></a>');
+        this.$rightOptions.append(this.$fullScreenBtn);
+        
+        if(!Utils.Device.isTouch()){
+            this.$rightOptions.children().addClass("no-touch");
+        }
+
+        this.updateButton(this.$downloadButton, "downloadEnabled");
+        this.updateButton(this.$printButton, "printEnabled");
+        this.updateFullScreenButton();
+        
 
         this.$informationBox = $('<div class="informationBox"> \
                                     <div class="message"></div> \
@@ -78,6 +139,27 @@ class HeaderPanel extends BaseView {
 
         this.$settingsButton.onPressed(() => {
             $.publish(BaseCommands.SHOW_SETTINGS_DIALOGUE);
+        });
+
+        this.$printButton.onPressed(() => {
+            var canvas = this.provider.getCurrentCanvas();
+            var viewer = (<ISeadragonExtension>this.extension).getViewer();
+            var imageUri = (<ISeadragonProvider>this.provider).getCroppedImageUri(canvas, viewer);
+            var imageUriTmp = imageUri.substring(0, imageUri.indexOf('/0/default.jpg'));
+            imageUri = imageUri.substring(0, imageUriTmp.lastIndexOf('/')) + '/full/0/default.jpg';
+            var title = this.extension.provider.getTitle();
+            var ra: RiksarkivetPrint = new RiksarkivetPrint();
+            ra.printImage(imageUri, title, canvas);
+            });        
+
+        this.$downloadButton.on('click', (e) => {
+            e.preventDefault();
+            $.publish(BaseCommands.SHOW_DOWNLOAD_DIALOGUE);
+        });
+
+        this.$fullScreenBtn.on('click', (e) => {
+            e.preventDefault();
+            $.publish(BaseCommands.TOGGLE_FULLSCREEN);
         });
 
         if (this.options.localeToggleEnabled === false){
@@ -169,6 +251,45 @@ class HeaderPanel extends BaseView {
             if (this.localeToggleIsVisible()) this.$localeToggleButton.show();
         }
     }
+
+    updateFullScreenButton(): void {
+        if (!Utils.Documents.SupportsFullscreen() || !Utils.Bools.GetBool(this.options.fullscreenEnabled, true)) {
+            this.$fullScreenBtn.hide();
+        }
+
+        if (this.provider.isLightbox) {
+            this.$fullScreenBtn.addClass('lightbox');
+        }
+
+        if (this.extension.isFullScreen()) {
+            this.$fullScreenBtn.swapClass('fullScreen', 'exitFullscreen');
+            //this.$fullScreenBtn.text(this.content.exitFullScreen);
+            this.$fullScreenBtn.attr('title', this.content.exitFullScreen);
+        } else {
+            this.$fullScreenBtn.swapClass('exitFullscreen', 'fullScreen');
+            //this.$fullScreenBtn.text(this.content.fullScreen);
+            this.$fullScreenBtn.attr('title', this.content.fullScreen);
+        }
+    }
+    
+    updateOldImageViewerLink(): void {
+        if (this.extension.isFullScreen()) {
+            this.$linkOldImageViewer.hide();
+        } else {
+            this.$linkOldImageViewer.show();
+        }
+    }
+
+    updateButton($button, buttonEnabled) {
+        var configEnabled = Utils.Bools.GetBool(this.options[buttonEnabled], true);
+
+        if (configEnabled) {
+           $button.show();
+        } else {
+            $button.hide();
+        }
+    }    
+
 }
 
 export = HeaderPanel;

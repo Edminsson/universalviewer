@@ -14,6 +14,7 @@ var Config = (function () {
             npm: './node_modules',
             themes: './src/themes',
             typings: './src/typings',
+            soktjanst: '../../Projekt/Riksarkivet/Sok/Web.Applications.NAD/universalviewer',
             uvMediaElementExtension: './src/extensions/uv-mediaelement-extension',
             uvPdfExtension: './src/extensions/uv-pdf-extension',
             uvSeadragonExtension: './src/extensions/uv-seadragon-extension',

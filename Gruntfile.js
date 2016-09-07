@@ -37,6 +37,11 @@ module.exports = function (grunt) {
             build : ['<%= config.dirs.build %>'],
             dist: ['<%= config.dirs.dist %>'],
             examples: ['<%= config.dirs.examples %>/uv-*'],
+            apphtml: ['<%= config.dirs.build %>/app.html'],
+            soktjanst: {
+                options: { force: true },
+                src: [ '<%= config.dirs.soktjanst %>/*']
+            },
             distexamples: ['<%= config.dirs.examples %>/uv-*.zip', '<%= config.dirs.examples %>/uv-*.tar'],
             extension: ['./src/extensions/*/build/*']
         },
@@ -83,7 +88,10 @@ module.exports = function (grunt) {
                             'json2.min.js',
                             'require.js',
                             'l10n.js',
-                            'base64.min.js'
+                            'base64.min.js',
+                            'openseadragon-filtering.js',
+                            'rangeslider.js',
+                            'rangeslider.css'
                         ],
                         dest: '<%= config.dirs.build %>/lib/'
                     },
@@ -186,6 +194,41 @@ module.exports = function (grunt) {
                     }
                 ]
             },
+            soktjanst: {
+                // copy files that we use from /dest to soktjanst/universalviewer.
+                files: [
+                    {
+                        cwd: '<%= config.dirs.build %>',
+                        expand: true,
+                        filter: 'isFile',
+                        src: [ 
+                            'themes/uv-sv-SE-theme/img/*',
+                            'themes/uv-sv-SE-theme/img/uv-moreinforightpanel-module/*',
+                            'themes/uv-sv-SE-theme/img/uv-pagingheaderpanel-module/*',
+                            'themes/uv-sv-SE-theme/img/uv-seadragoncenterpanel-module/*',
+                            'themes/uv-sv-SE-theme/img/uv-searchfooterpanel-module/*',
+                            'themes/uv-sv-SE-theme/img/uv-shared-module/*',
+                            'themes/uv-sv-SE-theme/img/uv-treeviewleftpanel-module/*',
+                            'themes/uv-sv-SE-theme/css/uv-seadragon-extension/theme.css',
+                            'lib/app.js',
+                            'lib/base64.min.js',
+                            'lib/easyXDM.min.js', 
+                            'lib/easyxdm.swf', 
+                            'lib/embed.js', 
+                            'lib/json2.min.js',
+                            'lib/openseadragon.js',
+                            'lib/openseadragon-filtering.js',
+                            'lib/require.js', 
+                            'lib/uv-seadragon-extension.en-GB.config.json',
+                            'lib/uv-seadragon-extension.sv-SE.config.json',
+                            'lib/uv-seadragon-extension-dependencies.js',
+                            'lib/rangeslider.js',
+                            'lib/rangeslider.css'
+                        ],
+                        dest: '<%= config.dirs.soktjanst %>/'
+                    }
+                ]
+            },
             distexamples: {
                 // copy zip archives to examples
                 files: [
@@ -236,7 +279,9 @@ module.exports = function (grunt) {
                             'jquery-tiny-pubsub/dist/ba-tiny-pubsub.min.js',
                             'key-codes/dist/key-codes.js',
                             'Units/Length.min.js',
-                            'utils/dist/utils.js'
+                            'utils/dist/utils.js',
+                            'rangeslider.js/dist/rangeslider.js',
+                            'rangeslider.js/dist/rangeslider.css'
                         ],
                         dest: '<%= config.dirs.lib %>'
                     },
@@ -255,6 +300,16 @@ module.exports = function (grunt) {
                             'utils/dist/utils.d.ts'
                         ],
                         dest: '<%= config.dirs.typings %>'
+                    },
+                    {
+                        // all files that need to be copied from /lib to /src/extensions/uv-seadragon-extension/lib post bower install
+                        cwd: '<%= config.dirs.bower %>',
+                        expand: true,
+                        flatten: true,
+                        src: [
+                            'openseadragon-filtering/openseadragon-filtering.js'
+                        ],
+                        dest: '<%= config.dirs.uvSeadragonExtension %>/lib'
                     }
                 ]
             },
@@ -435,7 +490,11 @@ module.exports = function (grunt) {
         configure: {
             apply: {
                 options: {
-                    default: 'en-GB'
+                    default: 'en-GB',
+                    enabledLocales: [
+                        'en-GB',
+                        'sv-SE'
+                    ]
                 }
             }
         },
@@ -542,6 +601,45 @@ module.exports = function (grunt) {
     grunt.registerTask("test", '', function(){
         grunt.task.run(
             'protractor:dev'
+        );
+    });
+
+    grunt.registerTask('build-soktjanst', '', function () {
+
+        refresh();
+        grunt.task.run(
+            'typescript:dist',
+            'clean:extension',
+            'configure:apply',
+            'clean:build',
+            'copy:schema',
+            'copy:build',
+            'exec:build',
+            'replace:html',
+            'replace:js',
+            'theme:create',
+            'theme:dist',
+            'replace:moduleimages',
+            'replace:themeimages',
+
+            //'build',
+            //'copy:app_rename',
+            'clean:apphtml',
+            'copy:soktjanst'
+        );
+    });
+
+    grunt.registerTask('copy-soktjanst', '', function () {
+        refresh();
+        grunt.task.run(
+            'copy:soktjanst'
+        );
+    });
+
+    grunt.registerTask('clean-soktjanst', '', function () {
+        refresh();
+        grunt.task.run(
+            'clean:soktjanst'
         );
     });
 };

@@ -14,6 +14,7 @@ import IProvider = require("./IProvider");
 import LoginDialogue = require("../../modules/uv-dialogues-module/LoginDialogue");
 import Params = require("../../Params");
 import Shell = require("./Shell");
+import Riksarkivet = require("../../modules/uv-shared-module/Riksarkivet");
 import IAccessToken = Manifesto.IAccessToken;
 import ILoginDialogueOptions = require("./ILoginDialogueOptions");
 import LoginWarningMessages = require("./LoginWarningMessages");
@@ -39,6 +40,7 @@ class BaseExtension implements IExtension {
     shell: Shell;
     shifted: boolean = false;
     tabbing: boolean = false;
+    riksarkivet: Riksarkivet;
 
     constructor(bootstrapper: BootStrapper) {
         this.bootstrapper = bootstrapper;
@@ -157,6 +159,7 @@ class BaseExtension implements IExtension {
                         if (e.keyCode === KeyCodes.KeyDown.DownArrow) event = BaseCommands.DOWN_ARROW;
                     }
                 }
+                if (e.ctrlKey && e.shiftKey && e.keyCode === KeyCodes.KeyDown.c) event = BaseCommands.COPY_SOURCE_REFERENCE;
 
                 if (event){
                     if (preventDefault) {
@@ -480,6 +483,8 @@ class BaseExtension implements IExtension {
             this.triggerSocket(BaseCommands.WINDOW_UNLOAD);
         });
 
+        this.riksarkivet = new Riksarkivet();
+
         // create shell and shared views.
         this.shell = new Shell(this.$element);
 
@@ -494,6 +499,7 @@ class BaseExtension implements IExtension {
                 this.loadDependencies(deps);
             });
         }
+
     }
 
     createModules(): void {
@@ -653,7 +659,7 @@ class BaseExtension implements IExtension {
 
         _.each(indices, (index) => {
             var canvas: Manifesto.ICanvas = this.provider.getCanvasByIndex(index);
-            var r: Manifesto.IExternalResource = new ExternalResource(canvas, this.provider.getInfoUri);
+            var r: Manifesto.IExternalResource = new ExternalResource(canvas, this.provider.getInfoUri, this.bootstrapper.isCORSEnabled());
 
             // used to reload resources with isResponseHandled = true.
             if (resources){
@@ -732,6 +738,12 @@ class BaseExtension implements IExtension {
         }
     }
 
+    SetUrlAfter(searchvalue: string, value: string): void {
+        if (this.provider.isDeepLinkingEnabled()) {
+            Utils.Urls.SetUrlAfter(searchvalue, value, parent.document);
+        }
+    }
+
     viewCanvas(canvasIndex: number): void {
         if (canvasIndex === -1) return;
 
@@ -744,8 +756,11 @@ class BaseExtension implements IExtension {
         this.provider.canvasIndex = canvasIndex;
 
         $.publish(BaseCommands.CANVAS_INDEX_CHANGED, [canvasIndex]);
-
         $.publish(BaseCommands.OPEN_EXTERNAL_RESOURCE);
+
+        var canvas: Manifesto.ICanvas = this.provider.getCanvasByIndex(canvasIndex);
+        var bildid = this.riksarkivet.GetBildIdFromCanvas(canvas);
+        this.SetUrlAfter("/", bildid);
 
         this.setParam(Params.canvasIndex, canvasIndex);
     }

@@ -53,8 +53,8 @@
         "pagingNote": "Please turn off Two Page View for additional options.",
         "preview": "Preview",
         "title": "Download",
-        "wholeImageHighRes": "Whole image {0} x {1}px ({2})",
-        "wholeImageLowResAsJpg": "Whole image {0} x {1}px (jpg)"
+        "wholeImageHighRes": "Whole image ({2})",
+        "wholeImageLowResAsJpg": "Whole image (jpg)"
       }
     },
     "embedDialogue": {
@@ -64,6 +64,16 @@
         "instructions": "To embed this item in your own website, copy and paste the code below.",
         "title": "Share",
         "width": "Width"
+      }
+    },
+    "headerPanel": {
+      "content": {
+        "settings": "Settings",
+        "download": "Download",
+        "exitFullScreen": "Exit Full Screen",
+        "fullScreen": "Full Screen",
+        "print": "Print page",
+        "backOldImageViewer": "Old Image Viewer"
       }
     },
     "footerPanel": {
@@ -114,11 +124,12 @@
         "logo": "Logo",
         "more": "more",
         "noData": "No data to display",
-        "title": "More Information",
-        "manifestHeader": "About the book",
+        "title": "Information",
+        "manifestHeader": "About the source",
         "canvasHeader": "About the image",
         "copyToClipboard": "Copy to clipboard",
-        "copiedToClipboard": "Copied to clipboard"
+        "copiedToClipboard": "Copied to clipboard",
+        "sourceReference": "Source reference"
       }
     },
     "pagingHeaderPanel": {
@@ -138,12 +149,14 @@
         "next": "Next",
         "nextImage": "Next Image",
         "nextPage": "Next Page",
+        "nextFivePages": "Forward five pages",
         "of": "of {0}",
         "oneUp": "Single page view",
         "page": "Page",
         "previous": "Previous",
         "previousImage": "Previous Image",
         "previousPage": "Previous Page",
+        "previousFivePages": "Back five pages",
         "settings": "Settings",
         "twoUp": "Two page view"
       }
@@ -151,7 +164,8 @@
     "seadragonCenterPanel": {
       "content": {
         "acknowledgements": "Attribution",
-        "goHome": "Go Home",
+        "adjust": "Adjust image",
+        "goHome": "Show entire page",
         "imageUnavailable": "Image Unavailable",
         "next": "Next",
         "previous": "Previous",
@@ -169,7 +183,7 @@
     {
       "content":
       {
-        "clearSearch": "Clear",
+        "clearSearch": "Clear Search",
         "defaultLabel": "-",
         "displaying": "{0} {1} of {2}",
         "enterKeyword": "Enter Keyword",
@@ -190,10 +204,19 @@
       "content": {
         "locale": "Locale",
         "navigatorEnabled": "Navigator Enabled",
+        "zoomPerClickEnabled": "Click to Zoom",
         "pagingEnabled": "Two Page View",
         "preserveViewport": "Preserve Zoom",
         "title": "Settings",
         "website": "<a href='https://github.com/universalviewer/universalviewer'>more info</a>"
+      }
+    },
+    "adjustDialogue": {
+      "content": {
+        "title": "Adjust image",
+        "contrast": "Contrast",
+        "brightness": "Brightness",
+        "reset": "Reset"
       }
     }
   }

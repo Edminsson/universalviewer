@@ -4,6 +4,7 @@ require.config({
         'ex': 'lib/ex.es3.min',
         'ext': 'lib/extensions',
         'httpstatuscodes': 'lib/http-status-codes',
+        'jquery': 'lib/jquery-1.10.2.min',
         'keycodes': 'lib/key-codes',
         'length': 'lib/Length.min',
         'manifesto': 'lib/manifesto',
@@ -13,7 +14,8 @@ require.config({
         'sanitize': 'lib/sanitize',
         'utils': 'lib/utils',
         'xdomainrequest': 'lib/jquery.xdomainrequest',
-        'yepnopecss': 'lib/yepnope.css'
+        'yepnopecss': 'lib/yepnope.css',
+        'rangeslider' : 'lib/rangeslider'
     }
 });
 
@@ -31,6 +33,7 @@ require([
     'ex',
     'ext',
     'httpstatuscodes',
+    'jquery',
     'keycodes',
     'length',
     'manifesto',
@@ -41,6 +44,7 @@ require([
     'utils',
     'xdomainrequest',
     'yepnopecss',
+    'rangeslider'
     ], (
     bootstrapper,
     mediaelementExtension,

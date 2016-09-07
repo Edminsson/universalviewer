@@ -22,6 +22,8 @@ class PagingHeaderPanel extends HeaderPanel {
     $pagingToggleButton: JQuery;
     $prevButton: JQuery;
     $prevOptions: JQuery;
+    $nextFiveButton: JQuery;
+    $prevFiveButton: JQuery;
     $selectionBoxOptions: JQuery;
     $imageSelectionBox: JQuery;
     $search: JQuery;
@@ -60,10 +62,13 @@ class PagingHeaderPanel extends HeaderPanel {
         this.$prevOptions = $('<div class="prevOptions"></div>');
         this.$centerOptions.append(this.$prevOptions);
 
-        this.$firstButton = $('<a class="imageBtn first" tabindex="15"></a>');
+        this.$firstButton = $('<a class="imageBtn first" tabindex="15"><span /></a>');
         this.$prevOptions.append(this.$firstButton);
 
-        this.$prevButton = $('<a class="imageBtn prev" tabindex="16"></a>');
+        this.$prevFiveButton = $('<a class="imageBtn prev-five" tabindex="16"><span /></a>');
+        this.$prevOptions.append(this.$prevFiveButton);
+
+        this.$prevButton = $('<a class="imageBtn prev" tabindex="17"><span /></a>');
         this.$prevOptions.append(this.$prevButton);
 
         this.$modeOptions = $('<div class="mode"></div>');
@@ -71,18 +76,18 @@ class PagingHeaderPanel extends HeaderPanel {
 
         this.$imageModeLabel = $('<label for="image">' + this.content.image + '</label>');
         this.$modeOptions.append(this.$imageModeLabel);
-        this.$imageModeOption = $('<input type="radio" id="image" name="mode" tabindex="17"/>');
+        this.$imageModeOption = $('<input type="radio" id="image" name="mode" tabindex="18"/>');
         this.$modeOptions.append(this.$imageModeOption);
 
         this.$pageModeLabel = $('<label for="page"></label>');
         this.$modeOptions.append(this.$pageModeLabel);
-        this.$pageModeOption = $('<input type="radio" id="page" name="mode" tabindex="18"/>');
+        this.$pageModeOption = $('<input type="radio" id="page" name="mode" tabindex="19"/>');
         this.$modeOptions.append(this.$pageModeOption);
 
         this.$search = $('<div class="search"></div>');
         this.$centerOptions.append(this.$search);
 
-        this.$searchText = $('<input class="searchText" maxlength="50" type="text" tabindex="19"/>');
+        this.$searchText = $('<input class="searchText" maxlength="50" type="text" tabindex="20"/>');
         this.$search.append(this.$searchText);
 
         if (this.options.autoCompleteBoxEnabled === true) {
@@ -150,11 +155,19 @@ class PagingHeaderPanel extends HeaderPanel {
         this.$nextOptions = $('<div class="nextOptions"></div>');
         this.$centerOptions.append(this.$nextOptions);
 
-        this.$nextButton = $('<a class="imageBtn next" tabindex="1"></a>');
+        this.$nextButton = $('<a class="imageBtn next" tabindex="1"><span /></a>');
         this.$nextOptions.append(this.$nextButton);
 
-        this.$lastButton = $('<a class="imageBtn last" tabindex="2"></a>');
+        this.$nextFiveButton = $('<a class="imageBtn next-five" tabindex="2"><span /></a>');
+        this.$nextOptions.append(this.$nextFiveButton);
+
+        this.$lastButton = $('<a class="imageBtn last" tabindex="3"><span /></a>');
         this.$nextOptions.append(this.$lastButton);
+        
+        
+        if(!Utils.Device.isTouch()){
+            this.$centerOptions.find(".imageBtn").addClass("no-touch");
+        }
 
         if (this.isPageModeEnabled()) {
             this.$pageModeOption.attr('checked', 'checked');
@@ -220,6 +233,14 @@ class PagingHeaderPanel extends HeaderPanel {
             }
         });
 
+        this.$prevFiveButton.onPressed(() => {
+            $.publish(Commands.PREV_FIVE);
+        });
+
+        this.$nextFiveButton.onPressed(() => {
+            $.publish(Commands.NEXT_FIVE);
+        });
+
         this.$nextButton.onPressed(() => {
             switch (viewingDirection.toString()){
                 case manifesto.ViewingDirection.leftToRight().toString():
@@ -233,7 +254,7 @@ class PagingHeaderPanel extends HeaderPanel {
 
         // If page mode is disabled, we don't need to show radio buttons since
         // there is only one option:
-        if (!this.config.options.pageModeEnabled) {
+        if (!this.config.options.pageModeEnabled || this.provider.hasNoPageNumbers) {
             this.$imageModeOption.hide();
             this.$pageModeLabel.hide();
             this.$pageModeOption.hide();
@@ -278,6 +299,7 @@ class PagingHeaderPanel extends HeaderPanel {
             }
         });
 
+        //Mode options are shown as default
         if (this.options.modeOptionsEnabled === false){
             this.$modeOptions.hide();
             this.$centerOptions.addClass('modeOptionsDisabled');
@@ -286,6 +308,12 @@ class PagingHeaderPanel extends HeaderPanel {
         //Search is shown as default
         if (this.options.imageSelectionBoxEnabled === true && this.options.autoCompleteBoxEnabled !== true){
             this.$search.hide();
+        }
+        
+        //Previous och next 5 buttons are hidden as default
+        if (!(this.options.prevNextFiveButtonsEnabled === true)) {
+            this.$prevFiveButton.hide();
+            this.$nextFiveButton.hide();
         }
 
         if (this.options.helpEnabled === false){
@@ -318,7 +346,7 @@ class PagingHeaderPanel extends HeaderPanel {
     }
 
     isPageModeEnabled(): boolean {
-        return this.config.options.pageModeEnabled && (<ISeadragonExtension>this.extension).getMode().toString() === Mode.page.toString();
+        return this.config.options.pageModeEnabled && !this.provider.hasNoPageNumbers && (<ISeadragonExtension>this.extension).getMode().toString() === Mode.page.toString();
     }
 
     setTitles(): void {
@@ -327,10 +355,14 @@ class PagingHeaderPanel extends HeaderPanel {
             this.$firstButton.prop('title', this.content.firstPage);
             this.$prevButton.prop('title', this.content.previousPage);
             this.$nextButton.prop('title', this.content.nextPage);
+            this.$prevFiveButton.prop('title', this.content.previousFivePages);
+            this.$nextFiveButton.prop('title', this.content.nextFivePages);
             this.$lastButton.prop('title', this.content.lastPage);
         } else {
             this.$firstButton.prop('title', this.content.firstImage);
             this.$prevButton.prop('title', this.content.previousImage);
+            this.$prevFiveButton.prop('title', this.content.previousFivePages);
+            this.$nextFiveButton.prop('title', this.content.nextFivePages);
             this.$nextButton.prop('title', this.content.nextImage);
             this.$lastButton.prop('title', this.content.lastImage);
         }

@@ -9,6 +9,7 @@ import Params = require("../../Params");
 import SearchResult = require("../../extensions/uv-seadragon-extension/SearchResult");
 import SearchResultRect = require("../../extensions/uv-seadragon-extension/SearchResultRect");
 
+
 class SeadragonCenterPanel extends CenterPanel {
 
     controlsVisible: boolean = false;
@@ -29,11 +30,13 @@ class SeadragonCenterPanel extends CenterPanel {
     $rightButton: JQuery;
     $leftButton: JQuery;
     $rotateButton: JQuery;
+    $adjustButton: JQuery;
     $spinner: JQuery;
     $viewer: JQuery;
     $zoomInButton: JQuery;
     $zoomOutButton: JQuery;
     $navigator: JQuery;
+    $toolbar: JQuery;
 
     constructor($element: JQuery) {
         super($element);
@@ -47,7 +50,8 @@ class SeadragonCenterPanel extends CenterPanel {
 
         this.$viewer = $('<div id="viewer"></div>');
         this.$content.prepend(this.$viewer);
-
+       
+        
         $.subscribe(BaseCommands.OPEN_EXTERNAL_RESOURCE, (e, resources: Manifesto.IExternalResource[]) => {
             Utils.Async.WaitFor(() => {
                 return this.isResized;
@@ -72,10 +76,12 @@ class SeadragonCenterPanel extends CenterPanel {
             id: "viewer",
             ajaxWithCredentials: false,
             showNavigationControl: true,
-            showNavigator: true,
+            showNavigator: true, //this.provider.config.options.navigatorEnabled == null ? true : this.provider.config.options.navigatorEnabled,
+            navigationControlAnchor: (this.config.options.showNavigationToTheRight || false) ? 2 : 1,
             showRotationControl: true,
             showHomeControl: this.config.options.showHomeControl || false,
             showFullPageControl: false,
+            zoomPerClick: this.provider.config.options.zoomPerClickEnabled ? 2.0 : 1.0,
             defaultZoomLevel: this.config.options.defaultZoomLevel || 0,
             controlsFadeDelay: this.config.options.controlsFadeDelay || 250,
             controlsFadeLength: this.config.options.controlsFadeLength || 250,
@@ -88,6 +94,8 @@ class SeadragonCenterPanel extends CenterPanel {
             blendTime: this.config.options.blendTime || 0,
             autoHideControls: this.config.options.autoHideControls == null ? true : this.config.options.autoHideControls,
             prefixUrl: prefixUrl,
+            minScrollDeltaTime: 10,
+            crossOriginPolicy: 'use-credentials',
             navImages: {
                 zoomIn: {
                     REST:   'zoom_in.png',
@@ -154,6 +162,17 @@ class SeadragonCenterPanel extends CenterPanel {
         this.$rotateButton.prop('title', this.content.rotateRight);
         this.$rotateButton.addClass('rotate');
         
+        this.$adjustButton = $('<div id="adjust"><img src="' + prefixUrl + 'contrast.png"></div>');
+        this.$adjustButton.attr('tabindex', 15);
+        this.$adjustButton.prop('title', this.content.adjust);
+        this.$adjustButton.insertAfter(this.$rotateButton);
+        
+        this.$adjustButton.on('click', (e) => {
+            e.preventDefault();
+            $.publish(BaseCommands.SHOW_ADJUST_DIALOGUE);
+        });
+        
+        
         this.$navigator = this.$viewer.find(".navigator");
         this.setNavigatorVisible();
 
@@ -215,6 +234,22 @@ class SeadragonCenterPanel extends CenterPanel {
         this.$rotateButton.on('click', () => {
             $.publish(Commands.SEADRAGON_ROTATION, [this.viewer.viewport.getRotation()]);
         });
+        
+        $.subscribe(BaseCommands.ADJUST_CONTRAST, (e, params) => {
+            this.contrastPercent = params;
+            this.adjustImage(false);
+        });
+        
+        $.subscribe(BaseCommands.ADJUST_BRIGHTNESS, (e, params) => {
+            this.brightnessPercent = params;
+            this.adjustImage(false);
+        });
+        
+        $.subscribe(BaseCommands.ADJUST_FINALIZE, (e, params) => {
+            this.adjustImage(true);
+        });
+        
+        this.adjustImage(true);
 
         this.title = (<ISeadragonProvider>this.extension.provider).getLabel();
 
@@ -237,6 +272,36 @@ class SeadragonCenterPanel extends CenterPanel {
         this.isCreated = true;
 
         this.resize();
+    }
+    
+    adjustImage(async: boolean) {
+        var processors = [];
+        
+        if (this.contrastPercent != 50)
+            processors.push(OpenSeadragon.Filters.CONTRAST(this.convertFromPercent(this.contrastPercent, 0.2, 1, 2)));
+            
+        if (this.brightnessPercent != 50)
+            processors.push(OpenSeadragon.Filters.BRIGHTNESS(this.convertFromPercent(this.brightnessPercent, -200, 0, 130)));
+        
+        this.viewer.setFilterOptions({
+            filters: {
+                processors: processors
+            },
+            loadMode: async ? 'async' : 'sync'
+        });
+    }
+ 
+    convertFromPercent(percent: number, min: number, center: number, max: number) {
+        if (percent == 50)
+            return center;
+        else if (percent < 50) {
+            var steps = (center - min) / 50;
+            return percent * steps + min;    
+        }
+        else {
+            var steps = (max - center) / 50;
+            return (percent - 50) * steps + center;    
+        }
     }
 
     createNavigationButtons() {
@@ -411,7 +476,6 @@ class SeadragonCenterPanel extends CenterPanel {
 
         // check for initial zoom/rotation params.
         if (this.isFirstLoad){
-
             this.initialRotation = this.extension.getParam(Params.rotation);
 
             if (this.initialRotation){
@@ -424,6 +488,12 @@ class SeadragonCenterPanel extends CenterPanel {
                 this.initialBounds = this.deserialiseBounds(this.initialBounds);
                 this.currentBounds = this.initialBounds;
                 this.fitToBounds(this.currentBounds);
+            }
+
+            if (window.matchMedia && window.matchMedia("(max-width: 1024px)").matches) {
+                var settings: ISettings = this.provider.getSettings();
+                settings.navigatorEnabled = false;
+                this.provider.updateSettings(settings);
             }
         } else {
             // it's not the first load
@@ -643,6 +713,14 @@ class SeadragonCenterPanel extends CenterPanel {
 
         if (this.currentBounds) {
             this.fitToBounds(this.currentBounds);
+        }
+
+        if (this.$title.css("position") === "absolute") {
+            this.$title.width(this.$viewer.width()
+                - 150
+                - parseInt(this.$title.css("left"), 10) 
+                - parseInt(this.$title.css("padding-left"), 10) 
+                - parseInt(this.$title.css("padding-right"), 10));
         }
 
         this.$title.ellipsisFill(this.provider.sanitize(this.title));

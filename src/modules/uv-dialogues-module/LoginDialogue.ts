@@ -39,8 +39,8 @@ class LoginDialogue extends Dialogue {
             this.close();
         });
 
-        this.$title = $('<h1></h1>');
-        this.$content.append(this.$title);
+        // this.$title = $('<h1></h1>');
+        // this.$content.append(this.$title);
 
         this.$content.append('\
             <div>\
@@ -87,18 +87,17 @@ class LoginDialogue extends Dialogue {
     open(): void {
         super.open();
 
-        this.$title.text(this.resource.loginService.getProperty('label'));
+        this.setTitle(this.resource.loginService.getProperty('label'));
 
         var message: string = this.resource.loginService.getProperty('description');
-
         if (this.options.warningMessage){
             message = '<span class="warning">' + this.provider.config.content[this.options.warningMessage] + '</span><span class="description">' + message + '</span>';
             //this.$logoutButton.show();
         } else {
             this.$logoutButton.hide();
         }
-
         this.$message.html(message);
+
         this.$message.targetBlank();
 
         this.$message.find('a').on('click', function() {

@@ -153,21 +153,23 @@ docReady(function() {
 
             return 0;
         }
+        
+        callback(window.jQuery, scriptUri, absScriptUri, loaded);
 
         // only load jQuery if not already included in page.
-        if (!(j = window.jQuery) || compareVersionNumbers(version, j.fn.jquery) || callback(j, scriptUri, absScriptUri, loaded)) {
-            var script = document.createElement("script");
-            script.type = "text/javascript";
-            script.src = "//cdnjs.cloudflare.com/ajax/libs/jquery/" + version + "/jquery.min.js";
-            script.onload = script.onreadystatechange = function () {
-                if (!loaded && (!(d = this.readyState) || d === "loaded" || d === "complete")) {
-                    callback((j = window.jQuery).noConflict(1), scriptUri, absScriptUri, loaded = true);
-                    j(script).remove();
-                }
-            };
-            document.getElementsByTagName("head")[0].appendChild(script);
-        }
-    })(window, document, "1.10.2", function ($, scriptUri, absScriptUri, jqueryLoaded) {
+        // if (!(j = window.jQuery) || compareVersionNumbers(version, j.fn.jquery) || callback(j, scriptUri, absScriptUri, loaded)) {
+        //     var script = document.createElement("script");
+        //     script.type = "text/javascript";
+        //     script.src = "//ajax.googleapis.com/ajax/libs/jquery/" + version + "/jquery.min.js";
+        //     script.onload = script.onreadystatechange = function () {
+        //         if (!loaded && (!(d = this.readyState) || d === "loaded" || d === "complete")) {
+        //             callback((j = window.jQuery).noConflict(1), scriptUri, absScriptUri, loaded = true);
+        //             j(script).remove();
+        //         }
+        //     };
+        //     document.getElementsByTagName("head")[0].appendChild(script);
+        // }
+    })(window, document, "1.10.1", function ($, scriptUri, absScriptUri, jqueryLoaded) {
 
         $.support.cors = true;
 
@@ -182,7 +184,7 @@ docReady(function() {
         }
 
         // get the part preceding 'lib/embed.js'
-        var baseUri = (/(.*)lib\/embed.js/).exec(scriptUri)[1];
+        var baseUri = (/(.*)lib\//).exec(scriptUri)[1];
         appUri = baseUri + 'app.html';
         easyXDMUri = 'https://cdnjs.cloudflare.com/ajax/libs/easyXDM/2.4.17.1/easyXDM.min.js';
         json2Uri = 'https://cdnjs.cloudflare.com/ajax/libs/easyXDM/2.4.17.1/json2.min.js';
@@ -207,12 +209,15 @@ docReady(function() {
         }
 
         function app(element, isHomeDomain, isOnlyInstance) {
-            var socket, $app, $img, $appFrame, manifestUri, collectionIndex, manifestIndex, sequenceIndex, canvasIndex, defaultToFullScreen, isLightbox, zoom, rotation, config, jsonp, locale, isFullScreen, dimensions, top, left, lastScroll, reload;
+            var socket, $app, $img, $appFrame, manifestUri, collectionIndex, manifestIndex, sequenceIndex, canvasIndex, defaultToFullScreen, isLightbox, zoom, rotation, config, jsonp, locale, isFullScreen, dimensions, top, left, lastScroll, reload, hasNoPageNumbers;
 
             $app = $(element);
 
             // Default to fullscreen
             defaultToFullScreen = $app.attr('data-fullscreen') === 'true';
+
+            // If PageNumbers are missing
+            hasNoPageNumbers = $app.attr('data-haspagenumbers') === 'false';
 
             // Lightbox behaviour
             isLightbox = $app.attr('data-lightbox') === 'true';
@@ -478,7 +483,8 @@ docReady(function() {
                     "&embedDomain=" + document.domain +
                     "&domain=" + domain +
                     "&isLightbox=" + isLightbox +
-                    "&locale=" + locale;
+                    "&locale=" + locale + 
+                    "&hasNoPageNumbers=" + hasNoPageNumbers;
 
                 if (reload) uri += "&reload=true";
                 if (config) uri += "&config=" + config;

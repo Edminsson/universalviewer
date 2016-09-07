@@ -18,7 +18,12 @@ class LeftPanel extends BaseExpandPanel {
     init(): void{
         super.init();
 
-        if (this.options.panelOpen) {
+        if (window.matchMedia && window.matchMedia("(max-width: 768px)").matches) 
+            return;
+
+        var panelOpenSaved = Utils.Bools.GetBool(this.provider.getSettings().panelOpenLeftPanel, true);
+
+        if (this.options.panelOpen && panelOpenSaved) {
             this.toggle(true);
         }
     }
@@ -37,12 +42,16 @@ class LeftPanel extends BaseExpandPanel {
 
     toggleFinish(): void {
         super.toggleFinish();
+        var settings: ISettings = this.provider.getSettings();
 
-        if (this.isExpanded){
+        if (this.isExpanded) {
+            settings.panelOpenLeftPanel = true;
             $.publish(BaseCommands.OPEN_LEFT_PANEL);
-        } else {
+        } else {           
+            settings.panelOpenLeftPanel = false;            
             $.publish(BaseCommands.CLOSE_LEFT_PANEL);
         }
+        this.provider.updateSettings(settings);
     }
 
     resize(): void {

@@ -15,12 +15,14 @@ class Commands {
     static MULTISELECT_CHANGE: string                   = Commands.namespace + 'onMultiSelectChange';
     static MULTISELECTION_MADE: string                  = Commands.namespace + 'onMultiSelectionMade';
     static NEXT: string                                 = Commands.namespace + 'onNext';
+    static NEXT_FIVE: string                            = Commands.namespace + 'onNextFive';
     static NEXT_SEARCH_RESULT: string                   = Commands.namespace + 'onNextSearchResult';
     static OPEN_THUMBS_VIEW: string                     = Commands.namespace + 'onOpenThumbsView';
     static OPEN_TREE_VIEW: string                       = Commands.namespace + 'onOpenTreeView';
     static PAGE_SEARCH: string                          = Commands.namespace + 'onPageSearch';
     static PAGING_TOGGLED: string                       = Commands.namespace + 'onPagingToggled';
     static PREV: string                                 = Commands.namespace + 'onPrev';
+    static PREV_FIVE: string                            = Commands.namespace + 'onPrevFive';
     static PREV_SEARCH_RESULT: string                   = Commands.namespace + 'onPrevSearchResult';
     static SEADRAGON_ANIMATION: string                  = Commands.namespace + 'onAnimation';
     static SEADRAGON_ANIMATION_FINISH: string           = Commands.namespace + 'onAnimationfinish';
