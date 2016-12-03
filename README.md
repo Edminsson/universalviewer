@@ -1,7 +1,7 @@
 # Universal Viewer Package
 This repo is a fork of Universalviewer/Universalviewer.
 
-The purpose is to make a npm package that only contains a distfolder.
+I want to make a npm package that only contains a dist folder.
 The package is supposed to contain the National Archives of Sweden's
 version of Universalviewer.
 
